@@ -42,10 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataReceivedEventArgs.cs" />
     <Compile Include="ONUManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TelnetClient.cs" />
+    <Compile Include="TelnetInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
