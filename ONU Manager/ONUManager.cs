@@ -10,8 +10,8 @@ namespace ONU_Manager
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Test");
-            Console.ReadKey(true);
+           // Console.WriteLine("Test");
+           // Console.ReadKey(true);
 
             //create a new telnet connection to hostname "10.10.110.115" on port "22"
             TelnetConnection tc = new TelnetConnection("10.10.110.115", 22);
