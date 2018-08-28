@@ -71,7 +71,7 @@ namespace ONU_Manager
         public string Read()
         {
             if (!tcpSocket.Connected) return null;
-            StringBuilder sb=new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             do
             {
                 ParseTelnet(sb);

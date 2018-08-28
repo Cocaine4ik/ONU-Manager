@@ -9,14 +9,35 @@ namespace ONU_Manager
     class ONUManager
     {
         static void Main(string[] args)
-        {
-            //create a new telnet connection to hostname "gobelijn" on port "23"
-            TelnetConnection tc = new TelnetConnection("10.10.", 23);
+        {  
+            string input = ""; // client input
+            string output = ""; // server output
 
-            //login with user "root",password "rootpassword", using a timeout of 100ms, and show server output
-            string s = tc.Login("root", "rootpassword", 100);
+            //create a new telnet connection to hostname "10.10.110.115" on port "23"
+            TelnetConnection tc = new TelnetConnection("10.10.110.115", 23);
+
+            //login with user "admin", password "admin", using a timeout of 100ms, and show server output
+            string s = tc.Login("admin", "admin", 100);
             Console.Write(s);
 
+            // read OLT answer after log in
+            Console.Write(tc.Read());
+
+            // show unconfig onu
+            input = "show gpon onu uncfg";
+            tc.WriteLine(input);
+
+            output = tc.Read();
+            if(output.Contains("No related information to show"))
+            Console.WriteLine("There are nothing to configure now!");
+            else Console.Write(output);
+
+            // exit from OLT console interface
+            Console.WriteLine("Press any key to exit.");
+            tc.WriteLine("exit");
+            Console.ReadKey(true);
+
+            /*
             // server output should end with "$" or ">", otherwise the connection failed
             string prompt = s.TrimEnd();
             prompt = s.Substring(prompt.Length - 1, 1);
@@ -35,10 +56,11 @@ namespace ONU_Manager
                 prompt = Console.ReadLine();
                 tc.WriteLine(prompt);
 
-                // display server output
-                Console.Write(tc.Read());
             }
             Console.WriteLine("***DISCONNECTED");
             Console.ReadLine();
+            */
         }
+    }
 }
+
