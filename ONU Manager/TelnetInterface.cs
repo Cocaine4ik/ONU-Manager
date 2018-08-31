@@ -85,6 +85,10 @@ namespace ONU_Manager
             get { return tcpSocket.Connected; }
         }
 
+        void ParseSpaces() {
+        
+        }
+
         void ParseTelnet(StringBuilder sb)
         {
             while (tcpSocket.Available > 0)

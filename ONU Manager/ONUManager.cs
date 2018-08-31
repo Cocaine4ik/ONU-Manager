@@ -32,6 +32,18 @@ namespace ONU_Manager
             Console.WriteLine("There are nothing to configure now!");
             else Console.Write(output);
 
+            int ponNumber;
+             string comparePon = output.Substring(157, 3);
+
+            if (comparePon.IndexOf(":") == 1)
+                ponNumber = (int)comparePon.Substring(0,1);
+                    else if (comparePon.IndexOf(":") == 2)
+                ponNumber = (int)comparePon.Substring(0,2);
+            else ponNumber = (int)comparePon;
+            
+            Console.WriteLine(ponNumber);
+
+
             // exit from OLT console interface
             Console.WriteLine("Press any key to exit.");
             tc.WriteLine("exit");
