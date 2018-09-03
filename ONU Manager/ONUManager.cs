@@ -12,6 +12,9 @@ namespace ONU_Manager
         {  
             string input = ""; // client input
             string output = ""; // server output
+            int ponNumber = 0; // pon number
+            int onuNumber = 0; // onu number
+            int vlan = 1000;
 
             //create a new telnet connection to hostname "10.10.110.115" on port "23"
             TelnetConnection tc = new TelnetConnection("10.10.110.115", 23);
@@ -32,22 +35,35 @@ namespace ONU_Manager
             Console.WriteLine("There are nothing to configure now!");
             else Console.Write(output);
 
-            int ponNumber;
-             string comparePon = output.Substring(157, 3);
-
-            if (comparePon.IndexOf(":") == 1)
-                ponNumber = (int)comparePon.Substring(0,1);
-                    else if (comparePon.IndexOf(":") == 2)
-                ponNumber = (int)comparePon.Substring(0,2);
-            else ponNumber = (int)comparePon;
+            // Must work correclt only if we have one or more onu to register
             
-            Console.WriteLine(ponNumber);
+            // (157, 3) - pon number area
+            string comparePon = output.Substring(157, 3);
+            // (169, 12) - serial number area
+            string sn = output.Substring(169, 12);
 
+            // write default vlan
+            vlan = 1000 + ponNumber;
 
+            // check substring comparePon 
+            // Console.WriteLine(comparePon);
+            // Console.WriteLine(sn);
+            if (comparePon.IndexOf(":") == 1)
+                ponNumber = Convert.ToInt32(comparePon.Substring(0,1));
+                    else ponNumber = Convert.ToInt32(comparePon.Substring(0,2));
+            
+            // Console.WriteLine(ponNumber);
+            tc.WriteLine("terminal length 0");
+            tc.WriteLine("show gpon onu state gpon-olt_1/2/" + ponNumber);
+            output = tc.Read();
+            Console.Write(output);
+
+            
             // exit from OLT console interface
             Console.WriteLine("Press any key to exit.");
             tc.WriteLine("exit");
             Console.ReadKey(true);
+            
 
             /*
             // server output should end with "$" or ">", otherwise the connection failed
