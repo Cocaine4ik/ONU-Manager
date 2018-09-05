@@ -12,6 +12,7 @@ namespace ONU_Manager
         {  
             string input = ""; // client input
             string output = ""; // server output
+            string sn = "";
             int ponNumber = 0; // pon number
             int onuNumber = 0; // onu number
             int vlan = 1000;
@@ -40,7 +41,7 @@ namespace ONU_Manager
             // (157, 3) - pon number area
             string comparePon = output.Substring(157, 3);
             // (169, 12) - serial number area
-            string sn = output.Substring(169, 12);
+            sn = output.Substring(169, 12);
 
             // write default vlan
             vlan = 1000 + ponNumber;
@@ -58,7 +59,52 @@ namespace ONU_Manager
             output = tc.Read();
             Console.Write(output);
 
+            // search for "ONU Number:" substring
+            int slotIndex = output.IndexOf("ONU Number:");
+            Console.WriteLine(slotIndex);
+            String checkOnuNumber = output.Substring(slotIndex + 12, 3);
+            Console.WriteLine(checkOnuNumber);
+            if(checkOnuNumber.IndexOf("/") == -1) {
+                onuNumber =  Convert.ToInt32(output.Substring(slotIndex + 15, 3));
+            Console.WriteLine(onuNumber);
+            }
+             else if (checkOnuNumber.IndexOf("/") == 2) {
+                onuNumber =  Convert.ToInt32(output.Substring(slotIndex + 15, 2));
+                Console.WriteLine(onuNumber);
+             }
+            else {
+                onuNumber =  Convert.ToInt32(output.Substring(slotIndex + 15, 1));
+                Console.WriteLine(onuNumber);
+            }
+            onuNumber += 1;
             
+            tc.WriteLine("configure terminal");
+            Console. Write(tc.Read());
+            tc.WriteLine("interface gpon-olt_1/2/" + ponNumber);
+            Console. Write(tc.Read());
+            tc.WriteLine("onu " + onuNumber + " type universal sn " + sn);
+            Console. Write(tc.Read());
+            tc.WriteLine("onu " + onuNumber + " profile line 500");
+            Console. Write(tc.Read());
+            tc.WriteLine("onu " + onuNumber + " profile remote standart");
+            Console. Write(tc.Read());
+            
+            tc.WriteLine("exit");
+            Console. Write(tc.Read());
+
+            tc.WriteLine("interface gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
+            Console. Write(tc.Read());
+            tc.WriteLine("switchport vlan " + vlan +" tag");
+            Console. Write(tc.Read());
+            
+            tc.WriteLine("exit");
+            Console. Write(tc.Read());
+
+            tc.WriteLine("pon-onu-mng gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
+            Console. Write(tc.Read());
+            tc.WriteLine("vlan port eth_0/1 mode tag vlan " + vlan);
+            Console. Write(tc.Read());
+
             // exit from OLT console interface
             Console.WriteLine("Press any key to exit.");
             tc.WriteLine("exit");
