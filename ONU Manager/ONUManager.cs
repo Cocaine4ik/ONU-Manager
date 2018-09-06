@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace ONU_Manager
 {
@@ -43,8 +44,7 @@ namespace ONU_Manager
             // (169, 12) - serial number area
             sn = output.Substring(169, 12);
 
-            // write default vlan
-            vlan = 1000 + ponNumber;
+
 
             // check substring comparePon 
             // Console.WriteLine(comparePon);
@@ -77,23 +77,29 @@ namespace ONU_Manager
                 Console.WriteLine(onuNumber);
             }
             onuNumber += 1;
-            
+
+            // write default vlan
+            vlan = 1000 + ponNumber;
+
             tc.WriteLine("configure terminal");
             Console. Write(tc.Read());
+
             tc.WriteLine("interface gpon-olt_1/2/" + ponNumber);
-            Console. Write(tc.Read());
             tc.WriteLine("onu " + onuNumber + " type universal sn " + sn);
             Console. Write(tc.Read());
-            tc.WriteLine("onu " + onuNumber + " profile line 500");
+            
+            tc.WriteLine("onu " + onuNumber + " profile line 500m");
             Console. Write(tc.Read());
+
             tc.WriteLine("onu " + onuNumber + " profile remote standart");
             Console. Write(tc.Read());
-            
+
             tc.WriteLine("exit");
             Console. Write(tc.Read());
 
             tc.WriteLine("interface gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
             Console. Write(tc.Read());
+
             tc.WriteLine("switchport vlan " + vlan +" tag");
             Console. Write(tc.Read());
             
@@ -102,12 +108,27 @@ namespace ONU_Manager
 
             tc.WriteLine("pon-onu-mng gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
             Console. Write(tc.Read());
+
             tc.WriteLine("vlan port eth_0/1 mode tag vlan " + vlan);
             Console. Write(tc.Read());
 
-            // exit from OLT console interface
-            Console.WriteLine("Press any key to exit.");
+            tc.WriteLine("show running-config interface gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
+            Console. Write(tc.Read());
+
             tc.WriteLine("exit");
+            Console. Write(tc.Read());
+            tc.WriteLine("exit");
+            Console. Write(tc.Read());
+
+            tc.WriteLine("show pon power onu-rx gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
+            Console. Write(tc.Read());
+            
+            tc.WriteLine("show pon power onu-rx gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
+            Console. Write(tc.Read());
+
+            // exit from OLT console interface
+           // Console.WriteLine("Press any key to exit.");
+            //tc.WriteLine("exit");
             Console.ReadKey(true);
             
 

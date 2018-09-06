@@ -73,8 +73,9 @@ namespace ONU_Manager
             if (!tcpSocket.Connected) return null;
             StringBuilder sb = new StringBuilder();
             do
-            {
+            {   
                 ParseTelnet(sb);
+                System.Threading.Thread.Sleep(100);
                 System.Threading.Thread.Sleep(TimeOutMs);
             } while (tcpSocket.Available > 0);
             return sb.ToString();
