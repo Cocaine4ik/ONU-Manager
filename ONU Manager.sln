@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ONU Manager", "ONU Manager\ONU Manager.csproj", "{637E5A21-6138-473E-88A5-26FE1EA70D43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ONU-Manager-AOE", "ONU-Manager-AOE\ONU-Manager-AOE.csproj", "{8EFE0A2A-9A41-4F61-8C7F-FF0CC235E812}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{637E5A21-6138-473E-88A5-26FE1EA70D43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{637E5A21-6138-473E-88A5-26FE1EA70D43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{637E5A21-6138-473E-88A5-26FE1EA70D43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EFE0A2A-9A41-4F61-8C7F-FF0CC235E812}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EFE0A2A-9A41-4F61-8C7F-FF0CC235E812}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EFE0A2A-9A41-4F61-8C7F-FF0CC235E812}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EFE0A2A-9A41-4F61-8C7F-FF0CC235E812}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
