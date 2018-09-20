@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.IO;
 
 namespace ONU_Manager
 {
@@ -17,6 +18,12 @@ namespace ONU_Manager
             int ponNumber = 0; // pon number
             int onuNumber = 0; // onu number
             int vlan = 1000; // default vlan
+
+            StreamWriter fw;
+            FileInfo checkfile = new FileInfo("check.txt");
+            fw = checkfile.CreateText();
+            fw.WriteLine("continue");
+            fw.Close();
 
             // create a new telnet connection to hostname "10.10.110.115" on port "23"
             TelnetConnection tc = new TelnetConnection("10.10.110.115", 23);
@@ -35,6 +42,9 @@ namespace ONU_Manager
             if(output.Contains("No related information to show")) {
 
                 Console.WriteLine("There are nothing to configure now!");
+                fw.WriteLine("break");
+                fw.Close();
+                Console.ReadKey(true);
             }
             else  {
                 Console.Write(output);
@@ -121,13 +131,11 @@ namespace ONU_Manager
 
             tc.WriteLine("show pon power onu-rx gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
             Console. Write(tc.Read());
-            
+
             }
             // exit from OLT console interface
            // Console.WriteLine("Press any key to exit.");
-            //tc.WriteLine("exit");
-            Console.ReadKey(true);
-            
+            //tc.WriteLine("exit");          
 
             /*
             // server output should end with "$" or ">", otherwise the connection failed
