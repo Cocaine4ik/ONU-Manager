@@ -23,7 +23,6 @@ namespace ONU_Manager
             FileInfo checkfile = new FileInfo("check.txt");
             fw = checkfile.CreateText();
             fw.WriteLine("continue");
-            fw.Close();
 
             // create a new telnet connection to hostname "10.10.110.115" on port "23"
             TelnetConnection tc = new TelnetConnection("10.10.110.115", 23);
