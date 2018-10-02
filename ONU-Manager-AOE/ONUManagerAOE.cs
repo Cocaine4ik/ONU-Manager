@@ -16,6 +16,9 @@ namespace ONU_Manager_AOE {
             Process process = new Process(); // Create new process
             // locate ONU Manager.exe 
             process.StartInfo = new ProcessStartInfo("D:\\C# Projects\\ONU-Manager\\ONU-Manager\\bin\\Debug\\ONU Manager.exe");
+            
+            // test for fr
+            if(fr.Equals("continue")) Console.WriteLine("ok");
 
             // create a flag cheacking if the process is active
             status = Process.GetProcessesByName("ONU Manager").Any() ? "active" : "inactive";
