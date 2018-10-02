@@ -1,0 +1,70 @@
+﻿<Window x:Class="ONU_Manager_WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ONU_Manager_WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="1024" Width="2048" Background="DeepSkyBlue">
+    <Grid ShowGridLines="True">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Button Name ="Search" Grid.Column="15" Grid.Row="1" Content="SEARCH" Grid.ColumnSpan="5"  Background="LightSkyBlue"/>
+        <Button Name ="Logo" Grid.Column="0" Grid.Row="0" Content="LOGO" Grid.ColumnSpan="4" Grid.RowSpan="3" Background="LightSkyBlue"/>
+        <Button Name="RegONU" Grid.Column="0" Grid.Row="4" Content="Register onu" Grid.ColumnSpan="2" Grid.RowSpan="2" Background="LightSkyBlue"/>
+        <Button Name="Test2" Grid.Column="0" Grid.Row="6" Content="Test button" Grid.ColumnSpan="2" Grid.RowSpan="2" Background="LightSkyBlue"/>
+        <Button Name="Test3" Grid.Column="0" Grid.Row="8" Content="Test button" Grid.ColumnSpan="2" Grid.RowSpan="2" Background="LightSkyBlue"/>
+        <Button Name="Test4" Grid.Column="0" Grid.Row="10" Content="Test button" Grid.ColumnSpan="2" Grid.RowSpan="2" Background="LightSkyBlue"/>
+        <Button Name="Test5" Grid.Column="0" Grid.Row="12" Content="Test button" Grid.ColumnSpan="2" Grid.RowSpan="2" Background="LightSkyBlue"/>
+        <Button Name="Test6" Grid.Column="0" Grid.Row="14" Content="Test button" Grid.ColumnSpan="2" Grid.RowSpan="2" Background="LightSkyBlue"/>
+        <Button Name="Tables" Grid.Column="3" Grid.Row="4" Content="TABLES" Grid.ColumnSpan="18" Grid.RowSpan="12" Background="LightSkyBlue"/>
+        <Button Name="Log" Grid.Column="0" Grid.Row="17" Content="LOG / CONSOLE" Grid.ColumnSpan="22" Grid.RowSpan="5" Background="LightSkyBlue"/>
+
+    </Grid>
+</Window>
