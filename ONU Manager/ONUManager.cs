@@ -5,160 +5,203 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace ONU_Manager
 {
     class ONUManager
     {
-        static void Main(string[] args)
-        {   string login;
-            string input; // client input
-            string output; // server output
-            string sn;
-            int ponNumber = 0; // pon number
-            int onuNumber = 0; // onu number
-            int vlan = 1000; // default vlan
+        static void Main(string[] args) {
+                        
+            string login; // переменная для логина
+            string input; // переменная дял клиентского ввода
+            string output; // переменная дял данных получаемых с сервера
+            string sn; // переменная для серийного номера ONU
+            string gponInfo;
 
-            StreamWriter fw;
-            FileInfo checkfile = new FileInfo("check.txt");
-            fw = checkfile.CreateText();
-            fw.WriteLine("continue");
+            int oltNumber = 0; // номер олт
+            int shelfNumber = 0; // номер платы на олт
+            int ponNumber = 0; // номер пона на олт интерфейсе
+            int onuNumber = 0; // номер слота для ону на поне
+            int vlan = 1000; // vlan по умолчанию
 
-            // create a new telnet connection to hostname "10.10.110.115" on port "23"
+            // Создание нового телнет соеденения по адресу "10.10.110.115" на порту номер "23"
             TelnetConnection tc = new TelnetConnection("10.10.110.115", 23);
 
-            // login with user "admin", password "admin", using a timeout of 100ms, 
-            // and show server output
-            login = tc.Login("admin", "admin", 100);
+            // залогиниться используя логин "admin", пароль "admin", с таймаутом в 100 мс
+            // и показать ответ сервера
+            login = tc.Login("admin", "admin", 300);
             Console.Write(login);
             Console.Write(tc.Read());
 
-            // show onu with out configure
+            // показаь незарегистрированые ONU
             tc.WriteLine("show gpon onu uncfg");
 
-            // make condition when we haven't got onu to configure
+            // условие при котором ONU не надо регистрировать 
             output = tc.Read();
-            if(output.Contains("No related information to show")) {
+            if (output.Contains("No related information to show")) {
 
                 Console.WriteLine("There are nothing to configure now!");
-                fw.WriteLine("break");
-                fw.Close();
                 Console.ReadKey(true);
             }
-            else  {
-                Console.Write(output);
-            
-                // (157, 3) - pon number area
-                string comparePon = output.Substring(157, 3);
-                // (169, 12) - serial number area
-                sn = output.Substring(169, 12);
+            else {
+                // ловим отупут сервера и парсим только инфомрацию о местонахождении ONU и ее серийный номер
+                String[] parseOutput = output.Split(new char[] { ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+                gponInfo = parseOutput[7]; // номер олт, платы, пона слота дял ону
+                sn = parseOutput[8]; // серийный номер ону
 
-                // checking substring comparePon 
-                // some troubles here whene we register to 1 numeral pon!!!
-                if (comparePon.IndexOf(":") == 1)
-                    ponNumber = Convert.ToInt32(comparePon.Substring(0,1));
-                        else ponNumber = Convert.ToInt32(comparePon.Substring(0,2));
-            
-                // remove the restriction on the output of text to the size of the window
-                tc.WriteLine("terminal length 0");
-                // show all onu in "ponNumber" pon
-                tc.WriteLine("show gpon onu state gpon-olt_1/2/" + ponNumber);
+                Console.WriteLine(gponInfo);
+
+                // парсим информацию об ONU на номер олт, платы, пона в отдельности
+                String[] parseGponInfo = gponInfo.Split(new char[] { '/', '_', ':'}, StringSplitOptions.RemoveEmptyEntries);
+                // приводим String к int
+
+                oltNumber = Int32.Parse(parseGponInfo[1]); // номера олт в числовом формате
+                shelfNumber = Int32.Parse(parseGponInfo[2]); // номера платы в числовом формате
+                ponNumber = Int32.Parse(parseGponInfo[3]); // номер пона в числовом формате
+
+                tc.WriteLine("terminal length 0"); // снимаем ограничение на ввода для терминала
+
+                String showGponOnuState = "show gpon onu state gpon-olt_" + oltNumber + "/"
+                    + shelfNumber + "/" + ponNumber;
+                String gponOnu = "gpon-onu_" + oltNumber + "/" + shelfNumber + "/" + ponNumber;
+
+                tc.WriteLine(showGponOnuState); // получаем информацию о кол-ве ону и о налчиии свободных слотов на поне
                 output = tc.Read();
-                Console.Write(output);
+                // Console.Write(output);
 
-                // search for "ONU Number:" substring
-                int slotIndex = output.IndexOf("ONU Number:");
+                // выбираем из всего вывода только занятых номера слотов на поне
+                MatchCollection match = Regex.Matches(output, @":(\d+)");
+                // обьявляем временные переменные которые помогут нам осуществить преобразование типов
+                String delta = "";
+                int num = 0;
+                // создаем лист который будет содержать в себе информацию о занятых слотах на поне
+                var slotList = new List<int>();
 
-                String checkOnuNumber = output.Substring(slotIndex + 12, 3);
-                if(checkOnuNumber.IndexOf("/") == -1) {
-                    onuNumber =  Convert.ToInt32(output.Substring(slotIndex + 15, 3));
-                Console.WriteLine(onuNumber);
+                // выбираем необходимые данные согласно регулярному выржанию заданному выше,
+                // записвыаем каждый занятый слот на поне как отдельный елемент списка
+                // int test = 0;
+                foreach (Match m in match) {
+                    delta += m.Groups[1];
+                    num = Int32.Parse(delta);
+                    slotList.Add(num);
+                    delta = "";
+                    num = 0;
+
+                    // Console.WriteLine(slotList[test]);
+                    // test++;
                 }
-                else if (checkOnuNumber.IndexOf("/") == 2) {
-                    onuNumber =  Convert.ToInt32(output.Substring(slotIndex + 15, 2));
-                Console.WriteLine(onuNumber);
+
+                // создаем лист для записи свободных слотов на поне
+                var freeSlotList = new List<int>();
+                bool freeSlotFlag = false;
+
+                // перебираем лист со всеми отображаемые слотами 
+                for (int i = 0; i < slotList.Count; i++) {
+
+                    // создаем вспомгательную переменную для записи разницы между проверяемым занятым  слотом и последующим занятым слотом
+                    int temp = 0;
+
+                    // првоерка чтобы при записи разницы в переменную temp не выйти за границу листа
+                    if (i < slotList.Count - 1) {
+                        temp = slotList[i + 1] - slotList[i];
+
+                    }
+
+                    // записываем в лист свободных слотов свободные слоты согласно разницы
+                    if (temp > 1) {
+                        for (int j = 1; j < temp; j++) {
+                            freeSlotList.Add(slotList[i] + j);
+                            freeSlotFlag = true;
+                        }
+                    }
                 }
-                else {
-                    onuNumber =  Convert.ToInt32(output.Substring(slotIndex + 15, 1));
-                Console.WriteLine(onuNumber);
+                // если пустых слотово нет записываем onuNumber следующий после последнего если он меньеше 128
+                if (freeSlotFlag == false) {
+                    if (slotList.Count + 1 < 128) {
+                        onuNumber = slotList.Count + 1;
+                    }
+                    // если следующий равен 128 то предупреждаем об этом
+                    else if (slotList.Count + 1 == 128) {
+                        onuNumber = slotList.Count + 1;
+                        Console.WriteLine("Warning! This is the last slot on PON!");
+                    }
+                    // если следующий больше 128 сворачиваем регистрацию и сообщаем об этом
+                    else {
+                        Console.WriteLine("Alert! This PON is full!");
+                        tc.WriteLine("exit");
+                    }
                 }
+                // записываем пустой слот в onuNumber
+                else if (freeSlotFlag == true) {
+                    onuNumber = freeSlotList[0];
+                }
+               /*
+                for (int i = 0; i < freeSlotList.Count; i++) {
+                    Console.WriteLine(freeSlotList[i]);
+                }*/
 
-                // make value next to last onu number value
-                onuNumber += 1;
+                vlan = 1000 + (ponNumber * (shelfNumber - 1));
+                Console.WriteLine(onuNumber);
+                Console.WriteLine(oltNumber);
+                Console.WriteLine(shelfNumber);
+                Console.WriteLine(ponNumber);
+                Console.WriteLine(vlan);
+                
+                // влючаем configure terminal
+                tc.WriteLine("Configure terminal");
+                Console.Write(tc.Read());
+                
 
-                // change vlan to standart
-                vlan = 1000 + ponNumber;
-            
-                tc.WriteLine("configure terminal");
-                Console. Write(tc.Read());
+                // заходим на необходимый интерфейс
+                tc.WriteLine("interface gpon-olt_" + oltNumber + "/" + shelfNumber + "/" + ponNumber);
+                tc.WriteLine("onu " + onuNumber + " type universal sn " + sn); // регистририуем ону на слоте как универсальную
+                Console.Write(tc.Read());
+                
+                // ставим скорость до 500 мб
+                tc.WriteLine("onu " + onuNumber + " profile line 500m");
+                Console.Write(tc.Read()); 
+                
+                 // ставим профель по стандарту
+                 tc.WriteLine("onu " + onuNumber + " profile remote standart");
+                 Console.Write(tc.Read());
 
-            tc.WriteLine("interface gpon-olt_1/2/" + ponNumber);
-            tc.WriteLine("onu " + onuNumber + " type universal sn " + sn);
-            Console. Write(tc.Read());          
-
-            tc.WriteLine("onu " + onuNumber + " profile line 500m");
-            Console. Write(tc.Read());
-
-            tc.WriteLine("onu " + onuNumber + " profile remote standart");
-            Console. Write(tc.Read());
-
-            tc.WriteLine("exit");
-            Console. Write(tc.Read());
-
-            tc.WriteLine("interface gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
-            Console. Write(tc.Read());
-
-            tc.WriteLine("switchport vlan " + vlan +" tag");
-            Console. Write(tc.Read());
-            
-            tc.WriteLine("exit");
-            Console. Write(tc.Read());
-
-            tc.WriteLine("pon-onu-mng gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
-            Console. Write(tc.Read());
-
-            tc.WriteLine("vlan port eth_0/1 mode tag vlan " + vlan);
-            Console. Write(tc.Read());
-
-            tc.WriteLine("show running-config interface gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
-            Console. Write(tc.Read());
-
-            tc.WriteLine("exit");
-            Console. Write(tc.Read());
-            tc.WriteLine("exit");
-            Console. Write(tc.Read());
-
-            tc.WriteLine("show pon power onu-rx gpon-onu_1/2/" + ponNumber + ":" + onuNumber);
-            Console. Write(tc.Read());
-
-            }
-            // exit from OLT console interface
-           // Console.WriteLine("Press any key to exit.");
-            //tc.WriteLine("exit");          
-
-            /*
-            // server output should end with "$" or ">", otherwise the connection failed
-            string prompt = s.TrimEnd();
-            prompt = s.Substring(prompt.Length - 1, 1);
-            if (prompt != "$" && prompt != ">")
-                throw new Exception("Connection failed");
-
-            prompt = "";
-
-            // while connected
-            while (tc.IsConnected && prompt.Trim() != "exit")
-            {
-                // display server output
+                tc.WriteLine("exit");
                 Console.Write(tc.Read());
 
-                // send client input to server
-                prompt = Console.ReadLine();
-                tc.WriteLine(prompt);
+                // Настройка оптичиеского порта
 
+                // заходим на оптический порт
+                tc.WriteLine("interface gpon-onu_" + oltNumber + "/" + shelfNumber + "/" + ponNumber + ":" + onuNumber);
+                 Console.Write(tc.Read());
+
+                //настраиваем влан на оптический порт
+                tc.WriteLine("switchport vlan " + vlan + " tag");
+                Console.Write(tc.Read());
+
+                tc.WriteLine("exit");
+                Console.Write(tc.Read());
+
+                // Настройка ethernet порта
+
+                // заходим на ethernet порт
+                tc.WriteLine("pon-onu-mng gpon-onu_" + oltNumber + "/" + shelfNumber + "/" + ponNumber + ":" + onuNumber);
+                Console.Write(tc.Read());
+
+                // настраиваем  влан на ethernet порт
+                tc.WriteLine("vlan port eth_0/1 mode tag vlan " + vlan);
+                Console.Write(tc.Read());
+
+                tc.WriteLine("exit");
+                Console.Write(tc.Read());
+
+                // првоеряем ли все настроено как надо
+                tc.WriteLine("show running-config interface gpon-onu_" + oltNumber + "/" + shelfNumber + "/" + ponNumber + ":" + onuNumber);
+                Console.Write(tc.Read());
+                
+                Console.ReadKey(true);
             }
-            Console.WriteLine("***DISCONNECTED");
-            Console.ReadLine();
-            */
+
         }
     }
 }

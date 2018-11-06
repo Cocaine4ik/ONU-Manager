@@ -81,6 +81,8 @@ namespace ONU_Manager
             return sb.ToString();
         }
 
+
+
         public bool IsConnected
         {
             get { return tcpSocket.Connected; }
@@ -89,7 +91,6 @@ namespace ONU_Manager
         void ParseSpaces() {
         
         }
-
         void ParseTelnet(StringBuilder sb)
         {
             while (tcpSocket.Available > 0)
